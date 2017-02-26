@@ -1,7 +1,7 @@
 {
-  "name": "programming-language",
+  "name": "spinel",
   "version": "0.0.0",
-  "description": "programming-language",
+  "description": "A toy programming language loosely resembling Ruby syntax",
   "license": "MIT",
   "repository": "",
   "author": "",
