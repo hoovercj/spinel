@@ -329,7 +329,7 @@ export class Scanner {
             case 7:
                 return (id === 'default') || (id === 'finally') || (id === 'extends');
             case 8:
-                return (id === 'function') || (id === 'continue') || (id === 'debugger');
+                return (id === 'continue') || (id === 'debugger');
             case 9:
                 return false;
             case 10:

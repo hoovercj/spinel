@@ -46,17 +46,17 @@ export interface TokenEntry {
 }
 
 export class Parser {
-    private  readonly config: Config;
-    private  readonly delegate: any;
-    private  readonly errorHandler: ErrorHandler;
-    private  readonly scanner: Scanner;
-    private  readonly operatorPrecedence: any;
+    public readonly config: Config;
+    private readonly delegate: any;
+    public readonly errorHandler: ErrorHandler;
+    private readonly scanner: Scanner;
+    private readonly operatorPrecedence: any;
 
     private lookahead: RawToken;
     private hasLineTerminator: boolean;
 
     private context: Context;
-    private tokens: any[];
+    public tokens: any[];
     private startMarker: Marker;
     private lastMarker: Marker;
 
@@ -145,6 +145,15 @@ export class Parser {
             line: this.scanner.lineNumber,
             column: this.scanner.index - this.scanner.lineStart
         };
+    }
+
+    public parseScript(): Node.Script {
+        const node = this.createNode();
+        const body = [] as Node.Statement[];
+        while (this.lookahead.type !== Token.EOF) {
+            body.push(this.parseStatementListItem());
+        }
+        return this.finalize(node, new Node.Script(body));
     }
 
     private throwError(messageFormat: string, ...values: any[]): void {
@@ -593,8 +602,7 @@ export class Parser {
                 } else {
                     this.context.isAssignmentTarget = false;
                     this.context.isBindingElement = false;
-                    if (this.matchKeyword('function')) {
-                        // TODO: change to 'def'
+                    if (this.matchKeyword('def')) {
                         expr = this.parseFunctionExpression();
                     } else {
                         expr = this.throwUnexpectedToken(this.nextToken());
@@ -962,7 +970,7 @@ export class Parser {
                 case 'const':
                     statement = this.parseLexicalDeclaration({ inFor: false });
                     break;
-                case 'function':
+                case 'def':
                     statement = this.parseFunctionDeclaration();
                     break;
                 case 'let':
@@ -1379,7 +1387,7 @@ export class Parser {
 
             this.context.labelSet[key] = true;
             let body: Node.Statement;
-            if (this.matchKeyword('function')) {
+            if (this.matchKeyword('def')) {
                 const token = this.lookahead;
                 const declaration = this.parseFunctionDeclaration();
                 body = declaration;
@@ -1465,7 +1473,7 @@ export class Parser {
                     case 'for':
                         statement = this.parseForStatement();
                         break;
-                    case 'function':
+                    case 'def':
                         statement = this.parseFunctionDeclaration();
                         break;
                     case 'if':
@@ -1605,7 +1613,7 @@ export class Parser {
             this.nextToken();
         }
 
-        this.expectKeyword('function');
+        this.expectKeyword('def');
 
         const isGenerator = isAsync ? false : this.match('*');
         if (isGenerator) {
@@ -1642,7 +1650,7 @@ export class Parser {
             this.nextToken();
         }
 
-        this.expectKeyword('function');
+        this.expectKeyword('def');
 
         const isGenerator = isAsync ? false : this.match('*');
         if (isGenerator) {
@@ -1686,10 +1694,7 @@ export class Parser {
                 break;
 
             case Token.Keyword:
-                start = (value === 'class') || (value === 'delete') ||
-                    (value === 'function') || (value === 'let') || (value === 'new') ||
-                    (value === 'super') || (value === 'this') || (value === 'typeof') ||
-                    (value === 'void') || (value === 'yield');
+                start = (value === 'def') || (value === 'let');
                 break;
 
             default:
