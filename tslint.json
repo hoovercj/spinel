@@ -4,6 +4,8 @@
         "object-literal-sort-keys": false,
         "max-classes-per-file": [ false ],
         "no-namespace": [ false ],
-        "quotemark": [ true, "single" ]
+        "quotemark": [ true, "single" ],
+        "trailing-comma": [ false ],
+        "interface-name": [ false ]
     }
 }
